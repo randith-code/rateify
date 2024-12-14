@@ -1,7 +1,26 @@
-import React from "react";
-import { Container, Row, Col, Button, Card } from "react-bootstrap";
+import React, { useEffect, useState } from "react";
+import { Carousel, Container, Row, Col, Button, Card } from "react-bootstrap";
+
+import { fetchProducts } from "../api/api";
+import { testimonials } from "../utils/staticdata";
 
 const HomePage = () => {
+  const [products, setProducts] = useState([]);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const getProducts = async () => {
+      try {
+        const data = await fetchProducts(12, 10);
+        setProducts(data.products);
+      } catch (error) {
+        setError("Error fetching products");
+      }
+    };
+
+    getProducts();
+  }, []);
+
   return (
     <div>
       <section
@@ -34,62 +53,56 @@ const HomePage = () => {
         <div style={{ zIndex: 2 }}>
           {" "}
           <h1 className="display-4 fw-normal">
-            Your Trusted Product Reviews, All in One Place.
+            Your Trusted Product Reviews, All in One Place
           </h1>
           <p className="lead fw-normal">
             Discover top-rated products and read authentic reviews from real
-            users.
+            users
           </p>
-          <Button className="rounded-pill" variant="primary" size="lg">
-            Get Started Now.
+          <Button
+            href="#product-list"
+            className="rounded-pill"
+            variant="primary"
+            size="lg"
+          >
+            Get Started Now
           </Button>
         </div>
       </section>
 
-      <section className="py-5">
+      <section id="product-list" className="py-5">
         <Container>
           <h2 className="text-center mb-4">Product Reviews</h2>
           <Row>
-            {/* Product Card 1 */}
-            <Col sm={12} md={4} className="mb-4">
-              <Card>
-                <Card.Body>
-                  <Card.Title>Product 1</Card.Title>
-                  <Card.Text>
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                  </Card.Text>
-                  <Button variant="outline-primary rounded-pill">
-                    Read More
-                  </Button>
-                </Card.Body>
-              </Card>
-            </Col>
-            {/* Product Card 2 */}
-            <Col sm={12} md={4} className="mb-4">
-              <Card>
-                <Card.Body>
-                  <Card.Title>Product 2</Card.Title>
-                  <Card.Text>
-                    Sed do eiusmod tempor incididunt ut labore et dolore magna
-                    aliqua.
-                  </Card.Text>
-                  <Button variant="outline-primary">Read More</Button>
-                </Card.Body>
-              </Card>
-            </Col>
-            {/* Product Card 3 */}
-            <Col sm={12} md={4} className="mb-4">
-              <Card>
-                <Card.Body>
-                  <Card.Title>Product 3</Card.Title>
-                  <Card.Text>
-                    Ut enim ad minim veniam, quis nostrud exercitation ullamco
-                    laboris nisi.
-                  </Card.Text>
-                  <Button variant="outline-primary">Read More</Button>
-                </Card.Body>
-              </Card>
-            </Col>
+            {products.map((product) => (
+              <Col sm={12} md={4} className="mb-4" key={product.id}>
+                <Card className="h-100 shadow-sm border-light rounded">
+                  <Card.Img
+                    variant="top"
+                    alt={`Image of ${product.title}`}
+                    src={product.images[0]}
+                    style={{ height: "250px", objectFit: "cover" }}
+                  />
+                  <Card.Body>
+                    <Card.Title>{product.title}</Card.Title>
+                    <div className="d-flex align-items-center">
+                      <span className="text-warning">
+                        {"⭐".repeat(Math.round(product.rating))}
+                      </span>
+                      <span className="ms-2">({product.rating})</span>
+                    </div>
+                    <Card.Text>{product.description}</Card.Text>
+                    <Button
+                      variant="outline-primary"
+                      className="rounded-pill"
+                      style={{}}
+                    >
+                      View Reviews
+                    </Button>
+                  </Card.Body>
+                </Card>
+              </Col>
+            ))}
           </Row>
         </Container>
       </section>
@@ -98,7 +111,6 @@ const HomePage = () => {
         <Container>
           <h2 className="text-center mb-4">Key Features</h2>
           <Row>
-            {/* Key Feature 1 */}
             <Col sm={12} md={4} className="mb-4">
               <Card className="text-center d-flex flex-column h-100">
                 <Card.Body className="d-flex flex-column">
@@ -114,7 +126,6 @@ const HomePage = () => {
                 </Card.Body>
               </Card>
             </Col>
-            {/* Key Feature 2 */}
             <Col sm={12} md={4} className="mb-4">
               <Card className="text-center d-flex flex-column h-100">
                 <Card.Body className="d-flex flex-column">
@@ -129,7 +140,6 @@ const HomePage = () => {
                 </Card.Body>
               </Card>
             </Col>
-            {/* Key Feature 3 */}
             <Col sm={12} md={4} className="mb-4">
               <Card className="text-center d-flex flex-column h-100">
                 <Card.Body className="d-flex flex-column">
@@ -145,6 +155,53 @@ const HomePage = () => {
               </Card>
             </Col>
           </Row>
+        </Container>
+      </section>
+
+      <section className="py-5">
+        <Container>
+          <h2 className="text-center mb-4">What Our Clients Say</h2>
+          <Carousel>
+            {testimonials.map((testimonial, index) => (
+              <Carousel.Item key={index}>
+                <Row className="justify-content-center">
+                  <Col sm={12} md={6} lg={6} className="mb-4">
+                    <Card className="h-100">
+                      <Card.Body className="d-flex flex-column">
+                        {/* Avatar and Name */}
+                        <div className="d-flex align-items-center mb-3">
+                          {/* Avatar image or icon */}
+                          <img
+                            src={testimonial.avatar}
+                            alt={testimonial.name}
+                            style={{
+                              width: "50px",
+                              height: "50px",
+                              borderRadius: "50%",
+                              marginRight: "10px",
+                            }}
+                          />
+                          {/* Client's name */}
+                          <Card.Title style={{ fontWeight: "bold" }}>
+                            {testimonial.name}
+                          </Card.Title>
+                        </div>
+                        {/* Location */}
+                        <Card.Subtitle
+                          className="mb-3"
+                          style={{ color: "#007bff" }}
+                        >
+                          {testimonial.location}
+                        </Card.Subtitle>
+                        {/* Testimonial */}
+                        <Card.Text>{testimonial.testimonial}</Card.Text>
+                      </Card.Body>
+                    </Card>
+                  </Col>
+                </Row>
+              </Carousel.Item>
+            ))}
+          </Carousel>
         </Container>
       </section>
     </div>
